@@ -12,7 +12,7 @@ For my project, i developed an application that works as a shopping list, the go
 
 ## Distinctiveness and Complexity: Why you believe your project satisfies the distinctiveness and complexity requirements, mentioned above.
 - [x] Your web application must be sufficiently distinct from the other projects in this course (and, in addition, may not be based on the old CS50W Pizza project), and more complex than those. A: The idea that i brought with this application is diferente from each one of the projects made so far, other than that, it also has some complexity to it for beeing more than just a list, but also helping you to decide where to go, and analise not only what you want to buy, but also wich one is closer and wich one is cheaper. 
-- [x]A project that appears to be a social network is a priori deemed by the staff to be indistinct from Project 4, and should not be submitted; it will be rejected. 
+- [x] A project that appears to be a social network is a priori deemed by the staff to be indistinct from Project 4, and should not be submitted; it will be rejected. 
 A: The project has no intention on creating a social inviroment, it's purpose is to act as a tool.
 - [x] A project that appears to be an e-commerce site is strongly suspected to be indistinct from Project 2, and your README.md file should be very clear as to why it’s not. Failing that, it should not be submitted; it will be rejected. 
 A: It is not a place for buying, it's a place that serves the purpose of not only helping you remenber the things you want to buy, but also directing you to it.
@@ -20,6 +20,51 @@ A: It is not a place for buying, it's a place that serves the purpose of not onl
 - [ ] Your web application must be mobile-responsive. A:
 
 ## What’s contained in each file you created.
+
+### ShoppingList (Project Folder)
+Main Django project configuration.
+
+- `settings.py`  
+  Contains project settings, authentication configuration, installed apps, and user model configuration.
+
+- `urls.py`  
+  Main URL configuration. Includes the routes from `listapp`.
+
+---
+
+### listapp (Application)
+Core application containing the business logic of the project.
+
+- `models.py`  
+  Defines the database structure:
+
+  - **User**  
+    Custom user model used for both regular users and supermarkets.  
+    Supermarkets have an additional `address` field to allow distance comparison.
+
+  - **List**  
+    Represents a shopping list created by a user.  
+    Contains:
+      - The owner (User)
+      - The list name
+      - The selected products
+
+  - **Product**  
+    Represents a product available in supermarkets.  
+    Contains:
+      - Name
+      - Picture
+      - Unit of measure
+
+  - **PriceMkt**  
+    Defines the relationship between a supermarket and a product.  
+    Stores the price of each product in each supermarket.
+
+- `views.py`  
+  Contains the main application logic and request handling.
+
+- `urls.py`  
+  Defines the routes for the application, including the index page.
 
 ## How to run your application.
 
