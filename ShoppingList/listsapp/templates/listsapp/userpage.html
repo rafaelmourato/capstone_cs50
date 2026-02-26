@@ -1,0 +1,16 @@
+{% extends "listsapp/layout.html" %}
+
+{% block body %}
+<h2>My Lists</h2>
+
+{% for list in lists %}
+    <p>
+        <a href="{% url 'listpage' list.id %}">
+            {{ list.name }}
+        </a>
+    </p>
+{% empty %}
+    <p>You have no lists.</p>
+{% endfor %}
+
+{% endblock %}

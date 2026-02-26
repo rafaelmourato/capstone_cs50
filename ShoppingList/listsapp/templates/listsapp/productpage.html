@@ -1,0 +1,13 @@
+{% extends "listsapp/layout.html" %}
+
+{% block body %}
+<h2>{{ product.name }}</h2>
+
+{% if product.picture %}
+    <img src="{{ product.picture }}" alt="{{ product.name }}" width="300">
+{% endif %}
+
+<p><strong>Unity:</strong> {{ product.unity }}</p>
+
+<a href="javascript:history.back()">← Back</a>
+{% endblock %}

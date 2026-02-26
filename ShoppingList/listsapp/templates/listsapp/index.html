@@ -1,5 +1,16 @@
 {% extends "listsapp/layout.html"%}
 
 {% block body%}
+{% for prod in products %}
+{{ prod.name}}
+{% endfor %}
+{% for sup in supermarkets %}
+{{ sup.username}}
+{% endfor %}
+{% if request.user.is_authenticated %}
+{% for lists in list %}
+{{ lists.name}}
+{% endfor %}
+{% endif %}
 
 {% endblock%}

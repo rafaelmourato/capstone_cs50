@@ -1,0 +1,14 @@
+{% extends "listsapp/layout.html" %}
+
+{% block body %}
+<h2>{{ list.name }}</h2>
+
+<h3>Products</h3>
+{% for product in products %}
+    <p>{{ product.name }} ({{ product.unity }})</p>
+{% empty %}
+    <p>No products in this list.</p>
+{% endfor %}
+
+<a href="{% url 'userpage' %}">← Back to my lists</a>
+{% endblock %}

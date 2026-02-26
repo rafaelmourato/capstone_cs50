@@ -1,0 +1,18 @@
+{% extends "listsapp/layout.html" %}
+
+{% block body %}
+<h2>{{ supermarket.username }}</h2>
+<p><strong>Address:</strong> {{ supermarket.address }}</p>
+
+<h3>Products</h3>
+{% for item in prices %}
+    <p>
+        <a href="{% url 'productpage' item.product.id %}">
+            {{ item.product.name }}
+        </a>
+        — {{ item.price }} €
+    </p>
+{% empty %}
+    <p>No products available.</p>
+{% endfor %}
+{% endblock %}
