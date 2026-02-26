@@ -1,16 +1,58 @@
-{% extends "listsapp/layout.html"%}
+{% extends "listsapp/layout.html" %}
 
-{% block body%}
-{% for prod in products %}
-{{ prod.name}}
-{% endfor %}
-{% for sup in supermarkets %}
-{{ sup.username}}
-{% endfor %}
+{% block body %}
+
+<h2>Products</h2>
+<ul>
+    {% for prod in products %}
+        <li>
+            <a href="{% url 'productpage' prod.id %}">
+                {{ prod.name }}
+            </a>
+        </li>
+    {% empty %}
+        <li>No products available.</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h2>Supermarkets</h2>
+<ul>
+    {% for sup in supermarkets %}
+        <li>
+            <a href="{% url 'supermarketpage' sup.id %}">
+                {{ sup.username }}
+            </a>
+            {% if sup.address %}
+                <br>
+                <small>{{ sup.address }}</small>
+            {% endif %}
+        </li>
+    {% empty %}
+        <li>No supermarkets found.</li>
+    {% endfor %}
+</ul>
+
 {% if request.user.is_authenticated %}
-{% for lists in list %}
-{{ lists.name}}
-{% endfor %}
+<hr>
+
+<h2>My Lists</h2>
+<ul>
+    {% for lst in list %}
+        <li>
+            <a href="{% url 'listpage' lst.id %}">
+                {{ lst.name }}
+            </a>
+        </li>
+    {% empty %}
+        <li>You have no lists.</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>
+    <a href="{% url 'login' %}">Log in</a> to see your lists.
+</p>
 {% endif %}
 
-{% endblock%}
+{% endblock %}

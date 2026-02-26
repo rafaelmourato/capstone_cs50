@@ -71,8 +71,12 @@ Core application containing the business logic of the project.
 
 #### templates
   Defines the templates for the project.
+
   - `layout.html`  
   Responsible for the main layout of the pages, so i can replicate a main layout.
+
+  - `index.html`  
+  The main page, where you can see all products and supermarkets. If you are logged in, also your lists.
 
   - `login.html`  
   The page where a user can login in it's account.
@@ -80,8 +84,17 @@ Core application containing the business logic of the project.
   - `logout.html`  
   The page where a user can logout in it's account.
 
-  - `register.html`  
-  The page where a user can register and say if it's a supermarket or a person.
+  - `listpage.html`  
+  It is a template for the page off a list, where you can see the products on it.
+
+  - `productpage.html`  
+  If you want to take a look at a especific product, you can enter it's page.
+
+  - `supermarketpage.html`  
+  To see a supermarket and wich products are avaiable, you can enter the supermarket page.
+
+  - `userpage.html`  
+  This is your page, where you can see your lists ( maybe later products bought )
 
 
 ## How to run your application.

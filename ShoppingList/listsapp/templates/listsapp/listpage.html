@@ -4,11 +4,30 @@
 <h2>{{ list.name }}</h2>
 
 <h3>Products</h3>
+<ul>
 {% for product in products %}
-    <p>{{ product.name }} ({{ product.unity }})</p>
+    <li>{{ product.name }} ({{ product.unity }})</li>
 {% empty %}
-    <p>No products in this list.</p>
+    <li>No products in this list.</li>
 {% endfor %}
+</ul>
 
+<hr>
+
+<h3>Add product</h3>
+<form method="post">
+    {% csrf_token %}
+    <select name="product_id" required>
+        <option value="">Select a product</option>
+        {% for product in all_products %}
+            <option value="{{ product.id }}">
+                {{ product.name }} ({{ product.unity }})
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Add</button>
+</form>
+
+<br>
 <a href="{% url 'userpage' %}">← Back to my lists</a>
 {% endblock %}

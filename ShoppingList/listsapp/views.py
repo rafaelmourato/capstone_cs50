@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.db import IntegrityError
 from .models import User, Product, List, PriceMkt
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 
 # Create your views here.
 
@@ -20,15 +20,25 @@ def index(request):
         "list": listuser,
         "products": products
     }) 
-
+    
 @login_required
 def listpage(request, list_id):
     list_obj = get_object_or_404(List, id=list_id, user=request.user)
-    products = list_obj.products.all().order_by("name")
+    if request.method == "POST":
+        product_id = request.POST.get("product_id")
+        if product_id:
+            product = get_object_or_404(Product, id=product_id)
+            if product not in list_obj.products.all():
+                list_obj.products.add(product)
+        return redirect("listpage", list_id=list_id)
+
+    products_in_list = list_obj.products.all().order_by("name")
+    all_products = Product.objects.all().order_by("name")
 
     return render(request, "listsapp/listpage.html", {
         "list": list_obj,
-        "products": products
+        "products": products_in_list,
+        "all_products": all_products
     })
 
 @login_required
