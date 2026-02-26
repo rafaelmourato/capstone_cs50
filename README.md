@@ -16,7 +16,7 @@ For my project, i developed an application that works as a shopping list, the go
 A: The project has no intention on creating a social inviroment, it's purpose is to act as a tool.
 - [x] A project that appears to be an e-commerce site is strongly suspected to be indistinct from Project 2, and your README.md file should be very clear as to why it’s not. Failing that, it should not be submitted; it will be rejected. 
 A: It is not a place for buying, it's a place that serves the purpose of not only helping you remenber the things you want to buy, but also directing you to it.
-- [ ] Your web application must utilize Django (including at least one model) on the back-end and JavaScript on the front-end. A:
+- [x] Your web application must utilize Django (including at least one model) on the back-end and JavaScript on the front-end. A: Created 4 models and js on the front.
 - [ ] Your web application must be mobile-responsive. A:
 
 ## What’s contained in each file you created.
@@ -39,7 +39,7 @@ Core application containing the business logic of the project.
   Defines the database structure:
 
   - **User**  
-    Custom user model used for both regular users and supermarkets.  
+    Custom user model used for both regular users and supermarkets, this way the supermarket could, in the future, adress it's own prices on the platform.  
     Supermarkets have an additional `address` field to allow distance comparison.
 
   - **List**  
@@ -61,10 +61,25 @@ Core application containing the business logic of the project.
     Stores the price of each product in each supermarket.
 
 - `views.py`  
-  Contains the main application logic and request handling.
+  Contains the main application logic and request handling. i created first the index and the views for login, logout and register.
 
 - `urls.py`  
-  Defines the routes for the application, including the index page.
+  Defines the routes for the application, including the index page, routes for login, logout and register.
+
+#### templates
+  Defines the templates for the project.
+  - `layout.html`  
+  Responsible for the main layout of the pages, so i can replicate a main layout.
+
+  - `login.html`  
+  The page where a user can login in it's account.
+
+  - `logout.html`  
+  The page where a user can logout in it's account.
+
+  - `register.html`  
+  The page where a user can register and say if it's a supermarket or a person.
+
 
 ## How to run your application.
 
