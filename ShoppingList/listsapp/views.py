@@ -70,7 +70,7 @@ def productpage(request, product_id):
             list = get_object_or_404(List, id=list_id)
             if product not in list.products.all():
                 list.products.add(product)
-        return redirect("listpage", list_id=list_id)
+        return redirect("productpage", product_id=product_id)
     
     if request.user.is_authenticated:
          lists = List.objects.filter(user=request.user).exclude(products=product)
