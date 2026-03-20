@@ -34,9 +34,9 @@
     {% endfor %}
 </ul>
 
-{% if request.user.is_authenticated %}
+{% if request.user.is_authenticated%}
 <hr>
-
+{% if not request.user.is_supermarket%}
 <h2>My Lists</h2>
 <ul>
     {% for lst in list %}
@@ -46,9 +46,10 @@
             </a>
         </li>
     {% empty %}
-        <li>You have no lists.</li>
+       <a href="{% url 'userpage' %}">You have no lists, go create some</a>
     {% endfor %}
 </ul>
+{% endif %}
 {% else %}
 <p>
     <a href="{% url 'login' %}">Log in</a> to see your lists.

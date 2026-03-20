@@ -7,17 +7,23 @@
     <body>
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="{% url 'index' %}">Lists</a>
+            <a class="navbar-brand" href="{% url 'index' %}">Shopping</a>
           
             <div>
               <ul class="navbar-nav mr-auto">
-                {% if user.is_authenticated %}
+                {% if request.user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
                     </li>
+                    {% if not request.user.is_supermarket%}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'userpage' %}">My lists</a>
+                        <a class="nav-link" href="{% url 'userpage' %}">My Lists</a>
                     </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'supermarketpage' request.user.id %}">My Supermarket</a>
+                    </li>
+                    {% endif %}
                 {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'login' %}">Log In</a>

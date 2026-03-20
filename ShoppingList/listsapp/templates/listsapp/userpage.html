@@ -3,14 +3,17 @@
 {% block body %}
 <h2>My Lists</h2>
 
-{% for list in lists %}
-    <p>
-        <a href="{% url 'listpage' list.id %}">
-            {{ list.name }}
-        </a>
-    </p>
-{% empty %}
-    <p>You have no lists.</p>
-{% endfor %}
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="listname" placeholder="List name" required>
+    <button type="submit">Create List</button>
+</form>
 
+<ul>
+    {% for list in lists %}
+        <li><a href="{% url 'listpage' list.id %}">{{ list.name }}</a></li>
+    {% empty %}
+        <li>No lists yet</li>
+    {% endfor %}
+</ul>
 {% endblock %}

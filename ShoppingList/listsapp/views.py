@@ -33,27 +33,28 @@ def listpage(request, list_id):
         return redirect("listpage", list_id=list_id)
 
     products_in_list = list_obj.products.all().order_by("name")
-    all_products = Product.objects.all().order_by("name")
+    all_products = Product.objects.exclude(id__in=products_in_list).order_by("name")
 
     return render(request, "listsapp/listpage.html", {
         "list": list_obj,
         "products": products_in_list,
-        "all_products": all_products
+        "all_products": all_products,
     })
 
 @login_required
 def userpage(request):
+    if request.method == "POST":
+        listname = request.POST.get("listname")
+        if listname:
+            List.objects.create(name=listname, user=request.user)
+            return redirect("userpage")
     lists = List.objects.filter(user=request.user)
     return render(request, "listsapp/userpage.html", {
         "lists": lists
     })
 
 def supermarketpage(request, supermarket_id):
-    supermarket = get_object_or_404(
-        User,
-        id=supermarket_id,
-        is_supermarket=True
-    )
+    supermarket = get_object_or_404(User, id=supermarket_id, is_supermarket=True)
     prices = PriceMkt.objects.filter(supermarket=supermarket).select_related("product")
     return render(request, "listsapp/supermarketpage.html", {
         "supermarket": supermarket,
@@ -62,8 +63,20 @@ def supermarketpage(request, supermarket_id):
 
 def productpage(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+    lists = None
+    if request.method == "POST":
+        list_id = request.POST.get("list_id")
+        if list_id:
+            list = get_object_or_404(List, id=list_id)
+            if product not in list.products.all():
+                list.products.add(product)
+        return redirect("listpage", list_id=list_id)
+    
+    if request.user.is_authenticated:
+         lists = List.objects.filter(user=request.user).exclude(products=product)
     return render(request, "listsapp/productpage.html", {
-        "product": product
+        "product": product,
+        "lists": lists
     })
 
 def login_view(request):
@@ -100,8 +113,6 @@ def register(request):
                 "message": "Passwords must match."
             })
         is_supermarket = request.POST.get("is_supermarket") == "on"
-
-
         try:
             user = User.objects.create_user(username, email, password)
             user.is_supermarket = is_supermarket

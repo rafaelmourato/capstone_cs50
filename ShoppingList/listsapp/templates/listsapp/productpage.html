@@ -9,5 +9,23 @@
 
 <p><strong>Unity:</strong> {{ product.unity }}</p>
 
+<hr>
+
+{% if request.user.is_authenticated %}
+<h3>Add To List</h3>
+<form method="post">
+    {% csrf_token %}
+    <select name="list_id" required>
+        <option value="">Select a List</option>
+        {% for list in lists %}
+            <option value="{{ list.id }}">
+                {{ list.name }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Add</button>
+</form>
+{% endif %}
+
 <a href="javascript:history.back()">← Back</a>
 {% endblock %}
