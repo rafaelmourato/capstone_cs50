@@ -55,10 +55,26 @@ def userpage(request):
 
 def supermarketpage(request, supermarket_id):
     supermarket = get_object_or_404(User, id=supermarket_id, is_supermarket=True)
-    prices = PriceMkt.objects.filter(supermarket=supermarket).select_related("product")
+    products = Product.objects.exclude(id__in=PriceMkt.objects.filter(supermarket=supermarket).values_list("product_id", flat=True))
+    supermarket_products = PriceMkt.objects.filter(supermarket=supermarket)
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "add_address":
+            address = request.POST.get("address")
+            if address:
+                supermarket.address = address
+                supermarket.save()
+        elif action == "add_product":
+            product_id = request.POST.get("product_id")
+            price = request.POST.get("price")
+            if product_id and price:
+                product = Product.objects.get(id=product_id)
+                PriceMkt.objects.create(supermarket=supermarket,product=product,price=price)
+        return redirect("supermarketpage", supermarket_id=supermarket.id)
     return render(request, "listsapp/supermarketpage.html", {
         "supermarket": supermarket,
-        "prices": prices
+        "products": products,
+        "supermarket_products": supermarket_products
     })
 
 def productpage(request, product_id):

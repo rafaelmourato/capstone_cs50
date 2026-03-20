@@ -14,14 +14,7 @@
 
                 Products found: 
                 {{ market.found_products }} / {{ market.total_products }} <br>
-
-                {% if market.found_products == market.total_products %}
-                   All products found
-                {% elif market.found_products > 0 %}
-                   Some products found
-                {% else %}
-                    No products found
-                {% endif %}
+                Adress: {% if  market.supermarket.adress %} {{ market.supermarket.adress }} {% else %} No Adress informed {% endif %}
             </li>
         {% endfor %}
     </ul>

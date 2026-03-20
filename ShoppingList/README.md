@@ -96,6 +96,9 @@ Core application containing the business logic of the project.
   - `userpage.html`  
   This is your page, where you can see your lists ( maybe later products bought )
 
+  - `prices.html`
+  Here it has a working mechanism that allows you to see wich supermarket has more products, and wich is cheaper or expensiver.
+
 
 ## How to run your application.
 
