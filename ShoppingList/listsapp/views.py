@@ -79,6 +79,31 @@ def productpage(request, product_id):
         "lists": lists
     })
 
+def prices(request, list_id):
+    list_obj = get_object_or_404(List, id=list_id, user=request.user)
+    products = list_obj.products.all()
+    supermarkets = User.objects.filter(is_supermarket=True)
+    price_per_market = []
+    total_products = products.count()
+    for supermarket in supermarkets:
+        total_price = 0
+        found_products = 0
+        for product in products:
+            price_obj = PriceMkt.objects.filter(supermarket=supermarket,product=product).first()
+            if price_obj:
+                total_price += price_obj.price
+                found_products += 1
+        price_per_market.append({
+            "supermarket": supermarket,
+            "total_price": total_price,
+            "found_products": found_products,
+            "total_products": total_products,
+        })
+
+    return render(request, "listsapp/prices.html", {
+        "price_per_market": price_per_market
+    })
+
 def login_view(request):
     if request.method == "POST":
 

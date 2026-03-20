@@ -1,7 +1,32 @@
-{% extend  "listsapp/layout.html" %}
+{% extends "listsapp/layout.html" %}
 
 {% block body %}
 
+<h2>Pricing per Market</h2>
 
+{% if price_per_market %}
+    <ul>
+        {% for market in price_per_market %}
+            <li style="margin-bottom: 15px;">
+                <strong>{{ market.supermarket.username }}</strong><br>
+
+                Total: $ {{ market.total_price }} <br>
+
+                Products found: 
+                {{ market.found_products }} / {{ market.total_products }} <br>
+
+                {% if market.found_products == market.total_products %}
+                   All products found
+                {% elif market.found_products > 0 %}
+                   Some products found
+                {% else %}
+                    No products found
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhum supermercado encontrado.</p>
+{% endif %}
 
 {% endblock %}
