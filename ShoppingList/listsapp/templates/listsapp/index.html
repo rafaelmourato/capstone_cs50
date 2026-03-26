@@ -1,59 +1,59 @@
 {% extends "listsapp/layout.html" %}
 
 {% block body %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold">Explore Products</h2>
+            </div>
+            
+            <div id="product-container">
+                {% include "listsapp/includes/product_list_partial.html" %}
+            </div>
+        </div>
 
-<h2>Products</h2>
-<ul>
-    {% for prod in products %}
-        <li>
-            <a href="{% url 'productpage' prod.id %}">
-                {{ prod.name }}
-            </a>
-        </li>
-    {% empty %}
-        <li>No products available.</li>
-    {% endfor %}
-</ul>
+        <div class="col-lg-4 mt-5">
+            <div class="card shadow-sm mb-4 border-0 bg-light">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold mb-3">Supermarkets</h4>
+                    <div class="list-group list-group-flush">
+                        {% for sup in supermarkets %}
+                            <a href="{% url 'supermarketpage' sup.id %}" class="list-group-item list-group-item-action bg-transparent border-0 px-0">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <h6 class="mb-1 text-primary">{{ sup.username }}</h6>
+                                    <i class="bi bi-chevron-right small text-muted"></i>
+                                </div>
+                                {% if sup.address %}
+                                    <small class="text-muted"><i class="bi bi-geo-alt"></i> {{ sup.address|truncatechars:30 }}</small>
+                                {% else %}
+                                    <small class="text-muted"><i class="bi bi-geo-alt"></i>No adress</small>
+                                {% endif %}
+                            </a>
+                        {% empty %}
+                            <p class="text-muted">No supermarkets found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
 
-<hr>
-
-<h2>Supermarkets</h2>
-<ul>
-    {% for sup in supermarkets %}
-        <li>
-            <a href="{% url 'supermarketpage' sup.id %}">
-                {{ sup.username }}
-            </a>
-            {% if sup.address %}
-                <br>
-                <small>{{ sup.address }}</small>
+            {% if request.user.is_authenticated and not request.user.is_supermarket %}
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold mb-3">My Lists</h4>
+                    <div class="d-grid gap-2">
+                        {% for lst in list %}
+                            <a href="{% url 'listpage' lst.id %}" class="btn btn-outline-dark btn-sm text-start">
+                                <i class="bi bi-list-check me-2"></i> {{ lst.name }}
+                            </a>
+                        {% empty %}
+                            <a href="{% url 'userpage' %}" class="btn btn-primary btn-sm">Create your first list</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
             {% endif %}
-        </li>
-    {% empty %}
-        <li>No supermarkets found.</li>
-    {% endfor %}
-</ul>
-
-{% if request.user.is_authenticated%}
-<hr>
-{% if not request.user.is_supermarket%}
-<h2>My Lists</h2>
-<ul>
-    {% for lst in list %}
-        <li>
-            <a href="{% url 'listpage' lst.id %}">
-                {{ lst.name }}
-            </a>
-        </li>
-    {% empty %}
-       <a href="{% url 'userpage' %}">You have no lists, go create some</a>
-    {% endfor %}
-</ul>
-{% endif %}
-{% else %}
-<p>
-    <a href="{% url 'login' %}">Log in</a> to see your lists.
-</p>
-{% endif %}
-
+        </div>
+    </div>
+</div>
 {% endblock %}

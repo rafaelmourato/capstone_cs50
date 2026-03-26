@@ -1,25 +1,40 @@
+import json
+
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.db import IntegrityError
 from .models import User, Product, List, PriceMkt
 from django.shortcuts import get_object_or_404, redirect
+from django.core.paginator import Paginator
+from django.http import JsonResponse
 
-# Create your views here.
+
 
 def index(request):
-    supermarkets = User.objects.all().filter(is_supermarket=True)
-    products = Product.objects.all().order_by("name")
+    supermarkets = User.objects.filter(is_supermarket=True)  
+    product_list = Product.objects.all().order_by("name")
+    
+    paginator = Paginator(product_list, 6)
+    page_number = request.GET.get("page")
+    products = paginator.get_page(page_number)
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        html = render_to_string("listsapp/includes/product_list_partial.html", {'products': products}, request=request)
+        return JsonResponse({'html': html})
+
     listuser = None
-    if request.user.is_authenticated :
+    if request.user.is_authenticated and not request.user.is_supermarket:
         listuser = List.objects.filter(user=request.user)
-    return render(request, "listsapp/index.html",{
+
+    return render(request, "listsapp/index.html", {
         "supermarkets": supermarkets,
         "list": listuser,
         "products": products
-    }) 
+    })
     
 @login_required
 def listpage(request, list_id):
@@ -52,6 +67,20 @@ def userpage(request):
     return render(request, "listsapp/userpage.html", {
         "lists": lists
     })
+
+@login_required
+def update_address(request, supermarket_id):
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        address = data.get("address")
+        supermarket = get_object_or_404(User, id=supermarket_id)
+        if request.user != supermarket:
+            return JsonResponse({"error": "Unauthorized"}, status=403)
+        supermarket.address = address
+        supermarket.save()
+        return JsonResponse({
+            "address": supermarket.address
+        })
 
 def supermarketpage(request, supermarket_id):
     supermarket = get_object_or_404(User, id=supermarket_id, is_supermarket=True)

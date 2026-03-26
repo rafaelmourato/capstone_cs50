@@ -11,8 +11,8 @@
 
 <hr>
 
-{% if request.user.is_authenticated %}
-<h3>Add To List</h3>
+{% if request.user.is_authenticated  and not request.user.is_supermarket %}
+<h3>Add To List</h3> #JS
 <form method="post">
     {% csrf_token %}
     <select name="list_id" required>

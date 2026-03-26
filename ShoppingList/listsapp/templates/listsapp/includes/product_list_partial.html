@@ -1,0 +1,53 @@
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for prod in products %}
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm hover-shadow transition">
+            {% if prod.picture %}
+                <img src="{{ prod.picture.url }}" class="card-img-top p-3" alt="{{ prod.name }}" style="height: 180px; object-fit: contain;">
+            {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                    <i class="bi bi-box text-muted display-4"></i>
+                </div>
+            {% endif %}
+            <div class="card-body text-center">
+                <h6 class="card-title mb-3">
+                    <a href="{% url 'productpage' prod.id %}" class="text-decoration-none text-dark fw-bold">
+                        {{ prod.name }}
+                    </a>
+                </h6>
+                <a href="{% url 'productpage' prod.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">No products available.</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% if products.paginator.num_pages > 1 %}
+<nav class="mt-5">
+  <ul class="pagination justify-content-center">
+    {% if products.has_previous %}
+      <li class="page-item">
+        <a class="page-link shadow-sm" href="?page={{ products.previous_page_number }}">Previous</a>
+      </li>
+    {% endif %}
+
+    {% for num in products.paginator.page_range %}
+        {% if products.number == num %}
+            <li class="page-item active"><span class="page-link shadow-sm">{{ num }}</span></li>
+        {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+            <li class="page-item"><a class="page-link shadow-sm" href="?page={{ num }}">{{ num }}</a></li>
+        {% endif %}
+    {% endfor %}
+
+    {% if products.has_next %}
+      <li class="page-item">
+        <a class="page-link shadow-sm" href="?page={{ products.next_page_number }}">Next</a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
