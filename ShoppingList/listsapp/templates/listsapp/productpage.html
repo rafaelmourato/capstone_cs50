@@ -1,31 +1,63 @@
 {% extends "listsapp/layout.html" %}
 
 {% block body %}
-<h2>{{ product.name }}</h2>
+<div class="container mt-5">
+    <a href="{% url 'index' %}" class="btn btn-link text-decoration-none text-muted p-0 mb-4">
+        <i class="bi bi-arrow-left"></i> Back to Products
+    </a>
 
-{% if product.picture %}
-    <img src="{{ product.picture }}" alt="{{ product.name }}" width="300">
-{% endif %}
+    <div class="row g-5 align-items-center">
+        <div class="col-md-6 text-center">
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-lg">
+                {% if product.picture %}
+                    <img src="{{ product.picture.url }}" alt="{{ product.name }}" class="img-fluid rounded" style="max-height: 400px; object-fit: contain;">
+                {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 300px;">
+                        <i class="bi bi-box text-muted" style="font-size: 5rem;"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
 
-<p><strong>Unity:</strong> {{ product.unity }}</p>
+        <div class="col-md-6">
+            <div id="alert-container"></div> <h1 class="display-5 fw-bold text-secondary mb-2">{{ product.name }}</h1>
+            <p class="badge bg-light text-muted border px-3 py-2 rounded-pill fs-6 mb-4">
+                Unit: {{ product.unity }}
+            </p>
 
-<hr>
+            <hr class="my-4">
 
-{% if request.user.is_authenticated  and not request.user.is_supermarket %}
-<h3>Add To List</h3> #JS
-<form method="post">
-    {% csrf_token %}
-    <select name="list_id" required>
-        <option value="">Select a List</option>
-        {% for list in lists %}
-            <option value="{{ list.id }}">
-                {{ list.name }}
-            </option>
-        {% endfor %}
-    </select>
-    <button type="submit">Add</button>
-</form>
-{% endif %}
+            {% if request.user.is_authenticated and not request.user.is_supermarket %}
+                <div class="card border-0 bg-light p-4 rounded-lg shadow-sm">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle me-2 text-primary"></i>Add to Shopping List</h5>
+                    
+                    <form id="add-to-list-form" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <select name="list_id" id="list-select" class="form-select border-0 shadow-sm px-3 py-2" required>
+                                <option value="">Choose a list...</option>
+                                {% for list in lists %}
+                                    <option value="{{ list.id }}">{{ list.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" id="add-btn" class="btn btn-primary btn-lg rounded-pill fw-bold">
+                                Add to List
+                            </button>
+                        </div>
+                    </form>
 
-<a href="{% url 'index' %}">← Back</a>
+                    <p id="no-lists-msg" class="text-muted small mt-3 {% if lists %}d-none{% endif %}">
+                        This product is already in all your lists, or you haven't created one yet.
+                    </p>
+                </div>
+            {% elif not request.user.is_authenticated %}
+                <div class="alert alert-info border-0 rounded-lg shadow-sm">
+                    <i class="bi bi-info-circle me-2"></i> <a href="{% url 'login' %}" class="fw-bold">Log in</a> to add this item to your shopping lists.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

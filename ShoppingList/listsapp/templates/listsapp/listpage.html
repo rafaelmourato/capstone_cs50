@@ -1,36 +1,59 @@
 {% extends "listsapp/layout.html" %}
 
 {% block body %}
-<h2>{{ list.name }}</h2>
+<div class="container mt-5">
+    <a href="{% url 'userpage' %}" class="btn btn-link text-decoration-none text-muted p-0 mb-3">
+        <i class="bi bi-chevron-left"></i> My Lists
+    </a>
 
-<h3>Products</h3>
-<ul>
-{% for product in products %}
-    <li>{{ product.name }} ({{ product.unity }})</li>
-{% empty %}
-    <li>No products in this list.</li>
-{% endfor %}
-</ul>
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            
+            <div class="text-center mb-4">
+                <h2 class="display-6 fw-bold text-secondary">{{ list.name }}</h2>
+                <a href="{% url 'prices' list.id %}" class="btn btn-success rounded-pill px-4 shadow-sm mt-2">
+                    <i class="bi bi-cart-check me-2"></i> Go Shopping
+                </a>
+            </div>
 
-<hr>
+            <div class="card border-0 shadow-sm mb-4 bg-light">
+                <div class="card-body">
+                    <form id="add-product-form" method="POST" class="row g-2">
+                        {% csrf_token %}
+                        <div class="col">
+                            <select name="product_id" id="product-select" class="form-select border-0 shadow-none" required>
+                                <option value="">Select a product to add...</option>
+                                {% for product in all_products %}
+                                    <option value="{{ product.id }}">
+                                        {{ product.name }} ({{ product.unity }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-<h3>Add product</h3> #JS 
-<form method="post">
-    {% csrf_token %}
-    <select name="product_id" required>
-        <option value="">Select a product</option>
-        {% for product in all_products %}
-            <option value="{{ product.id }}">
-                {{ product.name }} ({{ product.unity }})
-            </option>
-        {% endfor %}
-    </select>
-    <button type="submit">Add</button>
-</form>
+            <div class="card shadow-sm border-0">
+                <div class="list-group list-group-flush" id="product-list">
+                {% for product in products %}
+                    <div class="list-group-item d-flex align-items-center py-3 border-bottom">
+                        <i class="bi bi-circle me-3 text-muted"></i>
+                        <span class="fw-bold">{{ product.name }}</span>
+                        <span class="text-muted ms-2 small">({{ product.unity }})</span>
+                    </div>
+                {% empty %}
+                    <div id="empty-msg" class="p-4 text-center text-muted">
+                        No products in this list yet.
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
 
-<a href="{% url 'prices' list.id %}">Go Shopping</a>
-
-
-<br>
-<a href="{% url 'userpage' %}">← Back to my lists</a>
+        </div>
+    </div>
+</div>
 {% endblock %}

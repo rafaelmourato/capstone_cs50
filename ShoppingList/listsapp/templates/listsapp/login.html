@@ -1,24 +1,53 @@
 {% extends "listsapp/layout.html" %}
 
 {% block body %}
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-5 col-lg-4">
+            
+            <div class="card shadow border-0 rounded-lg p-4">
+                <div class="card-body text-center">
+                    
+                    <h2 class="fw-bold mb-4 text-secondary">Login</h2>
 
-    <h2>Login</h2>
+                    {% if message %}
+                        <div class="alert alert-danger p-2 small" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endif %}
 
-    {% if message %}
-        <div>{{ message }}</div>
-    {% endif %}
+                    <form action="{% url 'login' %}" method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group mb-3">
+                            <input autofocus class="form-control rounded-pill px-4" type="text" name="username" placeholder="Username">
+                        </div>
 
-    <form action="{% url 'login' %}" method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <input autofocus class="form-control" type="text" name="username" placeholder="Username">
+                        <div class="form-group mb-4">
+                            <input class="form-control rounded-pill px-4" type="password" name="password" placeholder="Password">
+                        </div>
+
+                        <div class="d-grid mb-3">
+                            <input class="btn btn-primary rounded-pill fw-bold" type="submit" value="Login">
+                        </div>
+                    </form>
+
+                    <div class="mt-4">
+                        <small class="text-muted">
+                            Don't have an account? <a href="{% url 'register' %}" class="text-decoration-none fw-bold">Register here.</a>
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="{% url 'index' %}" class="text-muted text-decoration-none small">
+                    <i class="bi bi-arrow-left"></i> Back to home
+                </a>
+            </div>
+
         </div>
-        <div class="form-group">
-            <input class="form-control" type="password" name="password" placeholder="Password">
-        </div>
-        <input class="btn btn-primary" type="submit" value="Login">
-    </form>
-
-    Don't have an account? <a href="{% url 'register' %}">Register here.</a>
-
+    </div>
+</div>
 {% endblock %}

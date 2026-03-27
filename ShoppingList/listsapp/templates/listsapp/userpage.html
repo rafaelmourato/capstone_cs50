@@ -1,19 +1,39 @@
 {% extends "listsapp/layout.html" %}
 
 {% block body %}
-<h2>My Lists</h2>
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold text-secondary">My Shopping Lists 📝</h2>
+        <p class="text-muted">Organize your groceries by supermarket or occasion.</p>
+    </div>
 
-<form method="POST">
-    {% csrf_token %}
-    <input type="text" name="listname" placeholder="List name" required>
-    <button type="submit">Create List</button>
-</form>
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-6">
+            <form method="POST" id="create-list-form" class="input-group shadow-sm">
+                {% csrf_token %}
+                <input type="text" id="new-list-name" name="listname" class="form-control border-0 px-4 py-3" placeholder="New list name (ex: Weekly Market)..." required>
+                <button class="btn btn-primary px-4" type="submit">
+                    <i class="bi bi-plus-lg"></i> Create
+                </button>
+            </form>
+        </div>
+    </div>
 
-<ul>
-    {% for list in lists %}
-        <li><a href="{% url 'listpage' list.id %}">{{ list.name }}</a></li>
-    {% empty %}
-        <li>No lists yet</li>
-    {% endfor %}
-</ul>
+    <div class="row g-4" id="lists-wrapper">
+        {% for list in lists %}
+        <div class="col-md-4 mb-3" id="list-card-{{ list.id }}">
+            <div class="card h-100 border-0 shadow-sm hover-shadow transition">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">{{ list.name }}</h5>
+                    <a href="{% url 'listpage' list.id %}" class="btn btn-outline-primary btn-sm rounded-pill w-100">
+                        Open List
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+            <p class="text-center text-muted" id="empty-msg">No lists yet.</p>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

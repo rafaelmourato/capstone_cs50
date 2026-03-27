@@ -39,17 +39,24 @@ def index(request):
 @login_required
 def listpage(request, list_id):
     list_obj = get_object_or_404(List, id=list_id, user=request.user)
+    
     if request.method == "POST":
         product_id = request.POST.get("product_id")
         if product_id:
             product = get_object_or_404(Product, id=product_id)
             if product not in list_obj.products.all():
                 list_obj.products.add(product)
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        "success": True,
+                        "id": product.id,
+                        "name": product.name,
+                        "unity": product.unity
+                    })
+      
         return redirect("listpage", list_id=list_id)
-
     products_in_list = list_obj.products.all().order_by("name")
     all_products = Product.objects.exclude(id__in=products_in_list).order_by("name")
-
     return render(request, "listsapp/listpage.html", {
         "list": list_obj,
         "products": products_in_list,
@@ -61,12 +68,18 @@ def userpage(request):
     if request.method == "POST":
         listname = request.POST.get("listname")
         if listname:
-            List.objects.create(name=listname, user=request.user)
+            new_list = List.objects.create(name=listname, user=request.user)
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    "id": new_list.id,
+                    "name": new_list.name,
+                    "url": reverse('listpage', args=[new_list.id])
+                })
             return redirect("userpage")
-    lists = List.objects.filter(user=request.user)
-    return render(request, "listsapp/userpage.html", {
-        "lists": lists
-    })
+            
+    lists = List.objects.filter(user=request.user).order_by('-id')
+    return render(request, "listsapp/userpage.html", {"lists": lists})
+
 
 @login_required
 def update_address(request, supermarket_id):
@@ -108,17 +121,27 @@ def supermarketpage(request, supermarket_id):
 
 def productpage(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    lists = None
+    
     if request.method == "POST":
         list_id = request.POST.get("list_id")
         if list_id:
-            list = get_object_or_404(List, id=list_id)
-            if product not in list.products.all():
-                list.products.add(product)
+            lista_obj = get_object_or_404(List, id=list_id, user=request.user)
+            if product not in lista_obj.products.all():
+                lista_obj.products.add(product)
+                
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        "success": True, 
+                        "list_name": lista_obj.name,
+                        "list_id": lista_obj.id
+                    })
+                    
         return redirect("productpage", product_id=product_id)
     
-    if request.user.is_authenticated:
+    lists = None
+    if request.user.is_authenticated and not request.user.is_supermarket:
          lists = List.objects.filter(user=request.user).exclude(products=product)
+         
     return render(request, "listsapp/productpage.html", {
         "product": product,
         "lists": lists
@@ -128,25 +151,29 @@ def prices(request, list_id):
     list_obj = get_object_or_404(List, id=list_id, user=request.user)
     products = list_obj.products.all()
     supermarkets = User.objects.filter(is_supermarket=True)
+    
     price_per_market = []
     total_products = products.count()
+    
     for supermarket in supermarkets:
         total_price = 0
         found_products = 0
         for product in products:
-            price_obj = PriceMkt.objects.filter(supermarket=supermarket,product=product).first()
+            price_obj = PriceMkt.objects.filter(supermarket=supermarket, product=product).first()
             if price_obj:
                 total_price += price_obj.price
                 found_products += 1
-        price_per_market.append({
-            "supermarket": supermarket,
-            "total_price": total_price,
-            "found_products": found_products,
-            "total_products": total_products,
-        })
-
+        if found_products > 0:
+            price_per_market.append({
+                "supermarket": supermarket,
+                "total_price": total_price,
+                "found_products": found_products,
+                "total_products": total_products,
+            })
+    price_per_market = sorted(price_per_market, key=lambda x: x['total_price'])
     return render(request, "listsapp/prices.html", {
-        "price_per_market": price_per_market
+        "price_per_market": price_per_market,
+        "list": list_obj 
     })
 
 def login_view(request):
