@@ -80,7 +80,6 @@ def userpage(request):
     lists = List.objects.filter(user=request.user).order_by('-id')
     return render(request, "listsapp/userpage.html", {"lists": lists})
 
-
 @login_required
 def update_address(request, supermarket_id):
     if request.method == "PUT":
@@ -97,22 +96,41 @@ def update_address(request, supermarket_id):
 
 def supermarketpage(request, supermarket_id):
     supermarket = get_object_or_404(User, id=supermarket_id, is_supermarket=True)
-    products = Product.objects.exclude(id__in=PriceMkt.objects.filter(supermarket=supermarket).values_list("product_id", flat=True))
-    supermarket_products = PriceMkt.objects.filter(supermarket=supermarket)
+    
     if request.method == "POST":
         action = request.POST.get("action")
-        if action == "add_address":
-            address = request.POST.get("address")
-            if address:
-                supermarket.address = address
-                supermarket.save()
-        elif action == "add_product":
+        
+        if action == "add_product":
             product_id = request.POST.get("product_id")
             price = request.POST.get("price")
+            
             if product_id and price:
                 product = Product.objects.get(id=product_id)
-                PriceMkt.objects.create(supermarket=supermarket,product=product,price=price)
+                # Cria o preço no mercado
+                new_price_mkt = PriceMkt.objects.create(
+                    supermarket=supermarket,
+                    product=product,
+                    price=price
+                )
+                
+                # SE FOR AJAX, RETORNA JSON
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse({
+                    "success": True,
+                    "id": product.id,
+                    "name": product.name,
+                    "price": str(price),
+                    "unity": product.unity if hasattr(product, 'unity') else "",
+                    "picture_url": product.picture.url if product.picture else None
+                })
+        
+        # Se não for AJAX ou for outra ação, redireciona normalmente
         return redirect("supermarketpage", supermarket_id=supermarket.id)
+
+    # Lógica do GET continua igual...
+    products = Product.objects.exclude(id__in=PriceMkt.objects.filter(supermarket=supermarket).values_list("product_id", flat=True))
+    supermarket_products = PriceMkt.objects.filter(supermarket=supermarket)
+    
     return render(request, "listsapp/supermarketpage.html", {
         "supermarket": supermarket,
         "products": products,
@@ -151,10 +169,8 @@ def prices(request, list_id):
     list_obj = get_object_or_404(List, id=list_id, user=request.user)
     products = list_obj.products.all()
     supermarkets = User.objects.filter(is_supermarket=True)
-    
     price_per_market = []
     total_products = products.count()
-    
     for supermarket in supermarkets:
         total_price = 0
         found_products = 0

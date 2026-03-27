@@ -58,10 +58,10 @@ function saveAddress() {
             <div class="bg-light p-3 rounded-pill border shadow-sm px-4 d-flex justify-content-between align-items-center">
                 <span id="address-text" class="text-muted">
                     <i class="bi bi-geo-alt-fill text-danger me-1"></i> 
-                    <strong>Address:</strong> ${data.address}
+                    <strong>Address:</strong> ${data.address}  
                 </span>
 
-                <button class="btn btn-sm btn-outline-secondary ms-3" id="edit-address-btn">
+                <button class="btn btn-sm ml-2 btn-outline-secondary ms-3" id="edit-address-btn">
                     Edit
                 </button>
             </div>
@@ -90,145 +90,154 @@ function getCookie(name) {
 }
 
 document.addEventListener("click", function(e) {
-        if (e.target.classList.contains("page-link")) {
-            e.preventDefault();
-            const url = e.target.href;
-            if (!url) return;
-            fetch(url, {
+    if (e.target.classList.contains("page-link")) {
+        e.preventDefault();
+        const url = e.target.href;
+        if (!url) return;
+        fetch(url, {
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("product-container").innerHTML = data.html;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("create-list-form");
+    
+    if (form) {
+        form.onsubmit = function(e) {
+            e.preventDefault(); 
+            const nameInput = document.getElementById("new-list-name");
+            const formData = new FormData();
+            formData.append("listname", nameInput.value);
+            formData.append("csrfmiddlewaretoken", getCookie("csrftoken"));
+            fetch("{% url 'userpage' %}", {
+                method: "POST",
+                body: formData,
                 headers: { "X-Requested-With": "XMLHttpRequest" }
             })
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
-                document.getElementById("product-container").innerHTML = data.html;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-    });
+                const emptyMsg = document.getElementById("empty-msg");
+                if (emptyMsg) emptyMsg.remove();
+                const newCard = `
+                    <div class="col-md-4 mb-3" id="list-card-${data.id}">
+                        <div class="card h-100 border-0 shadow-sm transition">
+                            <div class="card-body">
+                                <h5 class="fw-bold mb-3">${data.name}</h5>
+                                <a href="${data.url}" class="btn btn-outline-primary btn-sm rounded-pill w-100">Open List</a>
+                            </div>
+                        </div>
+                    </div>`;
+                
+                document.getElementById("lists-wrapper").insertAdjacentHTML('afterbegin', newCard);
+                nameInput.value = ""; 
+            })
+            .catch(error => console.error("Erro no Fetch:", error));
+        };
+    }
+});
 
 document.addEventListener("DOMContentLoaded", () => {
-        const form = document.getElementById("create-list-form");
-        
-        if (form) {
-            form.onsubmit = function(e) {
-                e.preventDefault(); 
-                const nameInput = document.getElementById("new-list-name");
-                const formData = new FormData();
-                formData.append("listname", nameInput.value);
-                formData.append("csrfmiddlewaretoken", getCookie("csrftoken"));
-                fetch("{% url 'userpage' %}", {
-                    method: "POST",
-                    body: formData,
-                    headers: { "X-Requested-With": "XMLHttpRequest" }
-                })
-                .then(r => r.json())
-                .then(data => {
+    const listForm = document.getElementById("add-product-to-list-form"); // Novo ID
+    const productSelect = document.getElementById("product-select");
+    const productList = document.getElementById("product-list");
+
+    if (listForm) {
+        listForm.onsubmit = function(e) {
+            e.preventDefault();
+            const productId = productSelect.value;
+            if (!productId) return;
+
+            const formData = new FormData();
+            formData.append("product_id", productId);
+            formData.append("csrfmiddlewaretoken", getCookie("csrftoken"));
+
+            fetch(window.location.href, {
+                method: "POST",
+                body: formData,
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
                     const emptyMsg = document.getElementById("empty-msg");
                     if (emptyMsg) emptyMsg.remove();
-                    const newCard = `
-                        <div class="col-md-4 mb-3" id="list-card-${data.id}">
-                            <div class="card h-100 border-0 shadow-sm transition">
-                                <div class="card-body">
-                                    <h5 class="fw-bold mb-3">${data.name}</h5>
-                                    <a href="${data.url}" class="btn btn-outline-primary btn-sm rounded-pill w-100">Open List</a>
-                                </div>
-                            </div>
+                    
+                    const newItem = `
+                        <div class="list-group-item d-flex align-items-center py-3 border-bottom animate__animated animate__fadeIn">
+                            <i class="bi bi-circle me-3 text-muted"></i>
+                            <span class="fw-bold">${data.name}</span>
+                            <span class="text-muted ms-2 small">(${data.unity || ''})</span>
                         </div>`;
                     
-                    document.getElementById("lists-wrapper").insertAdjacentHTML('afterbegin', newCard);
-                    nameInput.value = ""; 
-                })
-                .catch(error => console.error("Erro no Fetch:", error));
-            };
-        }
-    });
+                    productList.insertAdjacentHTML('afterbegin', newItem);
+                    
+                    const optionToRemove = productSelect.querySelector(`option[value="${productId}"]`);
+                    if (optionToRemove) optionToRemove.remove();
+                    listForm.reset();
+                }
+            })
+            .catch(error => console.error("Error adding to list:", error));
+        };
+    }
+});
+
+// --- FUNÇÃO PARA A PÁGINA DE SUPERMERCADO (supermarketpage) ---
 document.addEventListener("DOMContentLoaded", () => {
-        const addForm = document.getElementById("add-product-form");
-        const productSelect = document.getElementById("product-select");
-        const productList = document.getElementById("product-list");
+    const mktForm = document.getElementById("add-product-form"); // Mantém o ID original
+    const productSelect = document.getElementById("product-select");
+    const productList = document.getElementById("product-list");
 
-        if (addForm) {
-            addForm.onsubmit = function(e) {
-                e.preventDefault();
+    if (mktForm) {
+        mktForm.onsubmit = function(e) {
+            e.preventDefault();
+            const productId = productSelect.value;
+            const priceInput = mktForm.querySelector('input[name="price"]');
+            
+            if (!productId || !priceInput || !priceInput.value) return;
 
-                const productId = productSelect.value;
-                if (!productId) return;
+            const formData = new FormData();
+            formData.append("product_id", productId);
+            formData.append("price", priceInput.value);
+            formData.append("action", "add_product"); 
+            formData.append("csrfmiddlewaretoken", getCookie("csrftoken"));
 
-                const formData = new FormData();
-                formData.append("product_id", productId);
-                formData.append("csrfmiddlewaretoken", getCookie("csrftoken"));
-
-                fetch(window.location.href, {
-                    method: "POST",
-                    body: formData,
-                    headers: { "X-Requested-With": "XMLHttpRequest" }
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        const emptyMsg = document.getElementById("empty-msg");
-                        if (emptyMsg) emptyMsg.remove();
-                        const newItem = `
-                            <div class="list-group-item d-flex align-items-center py-3 border-bottom animate__animated animate__fadeIn">
-                                <i class="bi bi-circle me-3 text-muted"></i>
-                                <span class="fw-bold">${data.name}</span>
-                                <span class="text-muted ms-2 small">(${data.unity})</span>
-                            </div>`;
-                        productList.insertAdjacentHTML('afterbegin', newItem);
-                        const optionToRemove = productSelect.querySelector(`option[value="${data.id}"]`);
-                        if (optionToRemove) optionToRemove.remove();
-                        productSelect.value = "";
-                    }
-                })
-                .catch(error => console.error("Error adding product:", error));
-            };
-        }
-    });
-
-document.addEventListener("DOMContentLoaded", () => {
-        const addForm = document.getElementById("add-to-list-form");
-        const listSelect = document.getElementById("list-select");
-        const alertContainer = document.getElementById("alert-container");
-
-        if (addForm) {
-            addForm.onsubmit = function(e) {
-                e.preventDefault();
-
-                const listId = listSelect.value;
-                if (!listId) return;
-
-                const formData = new FormData();
-                formData.append("list_id", listId);
-                formData.append("csrfmiddlewaretoken", getCookie("csrftoken"));
-
-                fetch(window.location.href, {
-                    method: "POST",
-                    body: formData,
-                    headers: { "X-Requested-With": "XMLHttpRequest" }
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        // 1. Mostrar Alerta de Sucesso
-                        const alertHtml = `
-                            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-lg mb-4" role="alert">
-                                <i class="bi bi-check-circle-fill me-2"></i>
-                                Added to <strong>${data.list_name}</strong>!
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>`;
-                        alertContainer.innerHTML = alertHtml;
-
-                        // 2. Remover a opção do select
-                        const optionToRemove = listSelect.querySelector(`option[value="${data.list_id}"]`);
-                        if (optionToRemove) optionToRemove.remove();
-
-                        // 3. Se não sobrarem mais listas, mostrar aviso
-                        if (listSelect.options.length <= 1) { // 1 é a opção "Choose a list..."
-                            document.getElementById("no-lists-msg").classList.remove("d-none");
-                            addForm.classList.add("d-none");
-                        }
-                    }
-                })
-                .catch(err => console.error("Error:", err));
-            };
-        }
-    });
+            fetch(window.location.href, {
+                method: "POST",
+                body: formData,
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const emptyMsg = document.getElementById("no-products-msg");
+                    if (emptyMsg) emptyMsg.remove();
+                    
+                    const img = data.picture_url 
+                        ? `<img src="${data.picture_url}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">`
+                        : `<div style="width: 60px; height: 60px; background: #eee; border-radius: 8px; display: flex; align-items: center; justify-content: center;">📦</div>`;
+                    
+                    const newItem = `
+                        <div class="product-card border-bottom py-3 d-flex align-items-center">
+                            <div class="me-3 ml-2">${img}</div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 ml-2">${data.name}</h6>
+                                <small class="text-muted ml-2">$${data.price}</small>
+                            </div>
+                        </div>`; 
+                    
+                    productList.insertAdjacentHTML('afterbegin', newItem);
+                    const optionToRemove = productSelect.querySelector(`option[value="${productId}"]`);
+                    if (optionToRemove) optionToRemove.remove();
+                    mktForm.reset();
+                }
+            })
+            .catch(error => console.error("Error adding to market:", error));
+        };
+    }
+});
