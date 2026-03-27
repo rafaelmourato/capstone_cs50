@@ -1,29 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
     console.log("1. A página carregou. Procurando os botões...");
-
     const addBtn = document.getElementById("add-address-btn");
     const editBtn = document.getElementById("edit-address-btn");
-
     if (addBtn) {
-        addBtn.onclick = (e) => {
-            e.preventDefault(); 
-            showAddressForm();
-        };
-    }
-
+        addBtn.onclick = (e) => {e.preventDefault(); showAddressForm();};}
     if (editBtn) {
-        editBtn.onclick = (e) => {
-            e.preventDefault();
-            showAddressForm();
-        };
-    }
+        editBtn.onclick = (e) => {e.preventDefault(); showAddressForm(); };}
 });
 
 function showAddressForm() {
     const container = document.getElementById("address-container");
     const currentAddress = document.getElementById("address-text") ? 
         document.getElementById("address-text").innerText.replace('Address: ', '').trim() : '';
-
     container.innerHTML = `
         <div class="card border-dashed p-3 bg-light shadow-sm w-100">
             <div class="input-group">
@@ -50,7 +38,7 @@ function saveAddress() {
         body: JSON.stringify({ address: address })
     })
     .then(response => {
-        if (!response.ok) throw new Error("Erro de autorização ou servidor");
+        if (!response.ok) throw new Error("Error");
         return response.json();
     })
     .then(data => {
@@ -69,7 +57,7 @@ function saveAddress() {
         document.getElementById("edit-address-btn").onclick = showAddressForm;
     })
     .catch(error => {
-        alert("Erro ao salvar endereço. Tente novamente.");
+        alert("Error saving, try again.");
         console.error(error);
     });
 }
@@ -107,7 +95,6 @@ document.addEventListener("click", function(e) {
 
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("create-list-form");
-    
     if (form) {
         form.onsubmit = function(e) {
             e.preventDefault(); 
@@ -143,20 +130,17 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-    const listForm = document.getElementById("add-product-to-list-form"); // Novo ID
+    const listForm = document.getElementById("add-product-to-list-form");
     const productSelect = document.getElementById("product-select");
     const productList = document.getElementById("product-list");
-
     if (listForm) {
         listForm.onsubmit = function(e) {
             e.preventDefault();
             const productId = productSelect.value;
             if (!productId) return;
-
             const formData = new FormData();
             formData.append("product_id", productId);
             formData.append("csrfmiddlewaretoken", getCookie("csrftoken"));
-
             fetch(window.location.href, {
                 method: "POST",
                 body: formData,
@@ -167,16 +151,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.success) {
                     const emptyMsg = document.getElementById("empty-msg");
                     if (emptyMsg) emptyMsg.remove();
-                    
                     const newItem = `
                         <div class="list-group-item d-flex align-items-center py-3 border-bottom animate__animated animate__fadeIn">
                             <i class="bi bi-circle me-3 text-muted"></i>
                             <span class="fw-bold">${data.name}</span>
                             <span class="text-muted ms-2 small">(${data.unity || ''})</span>
                         </div>`;
-                    
                     productList.insertAdjacentHTML('afterbegin', newItem);
-                    
                     const optionToRemove = productSelect.querySelector(`option[value="${productId}"]`);
                     if (optionToRemove) optionToRemove.remove();
                     listForm.reset();
@@ -187,26 +168,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// --- FUNÇÃO PARA A PÁGINA DE SUPERMERCADO (supermarketpage) ---
 document.addEventListener("DOMContentLoaded", () => {
-    const mktForm = document.getElementById("add-product-form"); // Mantém o ID original
+    const mktForm = document.getElementById("add-product-form"); 
     const productSelect = document.getElementById("product-select");
     const productList = document.getElementById("product-list");
-
     if (mktForm) {
         mktForm.onsubmit = function(e) {
             e.preventDefault();
             const productId = productSelect.value;
             const priceInput = mktForm.querySelector('input[name="price"]');
-            
             if (!productId || !priceInput || !priceInput.value) return;
-
             const formData = new FormData();
             formData.append("product_id", productId);
             formData.append("price", priceInput.value);
             formData.append("action", "add_product"); 
             formData.append("csrfmiddlewaretoken", getCookie("csrftoken"));
-
             fetch(window.location.href, {
                 method: "POST",
                 body: formData,
@@ -217,11 +193,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.success) {
                     const emptyMsg = document.getElementById("no-products-msg");
                     if (emptyMsg) emptyMsg.remove();
-                    
                     const img = data.picture_url 
                         ? `<img src="${data.picture_url}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">`
                         : `<div style="width: 60px; height: 60px; background: #eee; border-radius: 8px; display: flex; align-items: center; justify-content: center;">📦</div>`;
-                    
                     const newItem = `
                         <div class="product-card border-bottom py-3 d-flex align-items-center">
                             <div class="me-3 ml-2">${img}</div>
