@@ -17,19 +17,15 @@ from django.http import JsonResponse
 def index(request):
     supermarkets = User.objects.filter(is_supermarket=True)  
     product_list = Product.objects.all().order_by("name")
-    
     paginator = Paginator(product_list, 6)
     page_number = request.GET.get("page")
     products = paginator.get_page(page_number)
-    
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = render_to_string("listsapp/includes/product_list_partial.html", {'products': products}, request=request)
         return JsonResponse({'html': html})
-
     listuser = None
     if request.user.is_authenticated and not request.user.is_supermarket:
         listuser = List.objects.filter(user=request.user)
-
     return render(request, "listsapp/index.html", {
         "supermarkets": supermarkets,
         "list": listuser,
@@ -39,7 +35,6 @@ def index(request):
 @login_required
 def listpage(request, list_id):
     list_obj = get_object_or_404(List, id=list_id, user=request.user)
-    
     if request.method == "POST":
         product_id = request.POST.get("product_id")
         if product_id:
@@ -53,7 +48,6 @@ def listpage(request, list_id):
                         "name": product.name,
                         "unity": product.unity
                     })
-      
         return redirect("listpage", list_id=list_id)
     products_in_list = list_obj.products.all().order_by("name")
     all_products = Product.objects.exclude(id__in=products_in_list).order_by("name")
@@ -76,7 +70,6 @@ def userpage(request):
                     "url": reverse('listpage', args=[new_list.id])
                 })
             return redirect("userpage")
-            
     lists = List.objects.filter(user=request.user).order_by('-id')
     return render(request, "listsapp/userpage.html", {"lists": lists})
 
@@ -96,24 +89,18 @@ def update_address(request, supermarket_id):
 
 def supermarketpage(request, supermarket_id):
     supermarket = get_object_or_404(User, id=supermarket_id, is_supermarket=True)
-    
     if request.method == "POST":
         action = request.POST.get("action")
-        
         if action == "add_product":
             product_id = request.POST.get("product_id")
             price = request.POST.get("price")
-            
             if product_id and price:
                 product = Product.objects.get(id=product_id)
-                # Cria o preço no mercado
                 new_price_mkt = PriceMkt.objects.create(
                     supermarket=supermarket,
                     product=product,
                     price=price
                 )
-                
-                # SE FOR AJAX, RETORNA JSON
                 if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                     return JsonResponse({
                     "success": True,
@@ -123,14 +110,9 @@ def supermarketpage(request, supermarket_id):
                     "unity": product.unity if hasattr(product, 'unity') else "",
                     "picture_url": product.picture.url if product.picture else None
                 })
-        
-        # Se não for AJAX ou for outra ação, redireciona normalmente
         return redirect("supermarketpage", supermarket_id=supermarket.id)
-
-    # Lógica do GET continua igual...
     products = Product.objects.exclude(id__in=PriceMkt.objects.filter(supermarket=supermarket).values_list("product_id", flat=True))
     supermarket_products = PriceMkt.objects.filter(supermarket=supermarket)
-    
     return render(request, "listsapp/supermarketpage.html", {
         "supermarket": supermarket,
         "products": products,
@@ -139,23 +121,19 @@ def supermarketpage(request, supermarket_id):
 
 def productpage(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    
     if request.method == "POST":
         list_id = request.POST.get("list_id")
         if list_id:
             lista_obj = get_object_or_404(List, id=list_id, user=request.user)
             if product not in lista_obj.products.all():
-                lista_obj.products.add(product)
-                
+                lista_obj.products.add(product)  
                 if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                     return JsonResponse({
                         "success": True, 
                         "list_name": lista_obj.name,
                         "list_id": lista_obj.id
-                    })
-                    
+                    })          
         return redirect("productpage", product_id=product_id)
-    
     lists = None
     if request.user.is_authenticated and not request.user.is_supermarket:
          lists = List.objects.filter(user=request.user).exclude(products=product)
