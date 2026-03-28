@@ -1,6 +1,6 @@
 import json
 
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -61,15 +61,29 @@ def listpage(request, list_id):
 def userpage(request):
     if request.method == "POST":
         listname = request.POST.get("listname")
-        if listname:
-            new_list = List.objects.create(name=listname, user=request.user)
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        
+        # Print para o terminal do Django (ajuda muito a investigar!)
+        print(f"--- NOVA REQUISIÇÃO POST ---")
+        print(f"Nome da lista: {listname}")
+        print(f"É AJAX?: {is_ajax}")
+        
+        if is_ajax:
+            if listname:
+                new_list = List.objects.create(name=listname, user=request.user)
                 return JsonResponse({
                     "id": new_list.id,
                     "name": new_list.name,
                     "url": reverse('listpage', args=[new_list.id])
                 })
-            return redirect("userpage")
+            else:
+                return JsonResponse({"error": "O nome da lista está vazio."}, status=400)
+                
+        # Se is_ajax for False (o cabeçalho sumiu no meio do caminho)
+        if listname:
+            List.objects.create(name=listname, user=request.user)
+        return redirect("userpage")
+
     lists = List.objects.filter(user=request.user).order_by('-id')
     return render(request, "listsapp/userpage.html", {"lists": lists})
 

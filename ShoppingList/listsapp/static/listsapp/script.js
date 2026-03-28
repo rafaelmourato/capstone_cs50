@@ -98,31 +98,54 @@ document.addEventListener("DOMContentLoaded", () => {
     if (form) {
         form.onsubmit = function(e) {
             e.preventDefault(); 
-            const nameInput = document.getElementById("new-list-name");
-            const formData = new FormData();
-            formData.append("listname", nameInput.value);
-            formData.append("csrfmiddlewaretoken", getCookie("csrftoken"));
-            fetch("{% url 'userpage' %}", {
+            const url = form.getAttribute("data-url") || window.location.href;
+            const formData = new FormData(form); 
+            
+            fetch(url, {
                 method: "POST",
                 body: formData,
-                headers: { "X-Requested-With": "XMLHttpRequest" }
+                headers: { 
+                    "X-Requested-With": "XMLHttpRequest" 
+                }
             })
-            .then(r => r.json())
+            .then(async response => {
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+                
+                // MODO DETETIVE: Lemos como texto primeiro
+                const text = await response.text(); 
+                try {
+                    return JSON.parse(text); // Tenta converter para JSON
+                } catch (err) {
+                    console.error("🚨 O servidor não retornou JSON! Veja o que chegou:");
+                    console.error(text.substring(0, 250) + "..."); // Mostra as primeiras linhas do HTML
+                    throw new Error("A resposta não é um JSON válido.");
+                }
+            })
             .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
                 const emptyMsg = document.getElementById("empty-msg");
                 if (emptyMsg) emptyMsg.remove();
+
                 const newCard = `
                     <div class="col-md-4 mb-3" id="list-card-${data.id}">
-                        <div class="card h-100 border-0 shadow-sm transition">
+                        <div class="card h-100 border-0 shadow-sm hover-shadow transition">
                             <div class="card-body">
                                 <h5 class="fw-bold mb-3">${data.name}</h5>
-                                <a href="${data.url}" class="btn btn-outline-primary btn-sm rounded-pill w-100">Open List</a>
+                                <a href="${data.url}" class="btn btn-outline-primary btn-sm rounded-pill w-100">
+                                    Open List
+                                </a>
                             </div>
                         </div>
                     </div>`;
                 
                 document.getElementById("lists-wrapper").insertAdjacentHTML('afterbegin', newCard);
-                nameInput.value = ""; 
+                form.reset(); 
             })
             .catch(error => console.error("Erro no Fetch:", error));
         };

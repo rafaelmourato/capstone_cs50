@@ -9,9 +9,9 @@
 
     <div class="row justify-content-center mb-5">
         <div class="col-md-6">
-            <form method="POST" id="create-list-form" class="input-group shadow-sm">
+            <form method="POST" id="create-list-form" data-url="/user/" class="input-group shadow-sm">
                 {% csrf_token %}
-                <input type="text" id="new-list-name" name="listname" class="form-control border-0 px-4 py-3" placeholder="New list name (ex: Weekly Market)..." required>
+                <input type="text" id="new-list-name" name="listname" class="form-control border-0 px-4 py-3" placeholder="New list name..." required>
                 <button class="btn btn-primary px-4" type="submit">
                     <i class="bi bi-plus-lg"></i> Create
                 </button>
