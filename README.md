@@ -7,31 +7,59 @@ Instructors: Brian Yu and David J. Malan
 
 ## Objective
 
-In the final project from the CS50 course, we're challenged to create a solution off my own, using python, javascript and everything learned to do so. 
-For my project, i developed an application that works as a shopping list, the goal is to be abble to add things to your shopping list everytime you miss something at your home, and when you go out to do the groceries, it will find the places that have all or most off the items on your shopping list and the one with the best price, it serves as a tool to help your decision making.
+In the final project from the CS50 course, the challenge was to create a solution off my own, using python, javascript and everything learned during the course. 
 
-## Distinctiveness and Complexity: Why you believe your project satisfies the distinctiveness and complexity requirements, mentioned above.
-- [x] Your web application must be sufficiently distinct from the other projects in this course (and, in addition, may not be based on the old CS50W Pizza project), and more complex than those. 
-A: The idea that i brought with this application is diferente from each one of the projects made so far, other than that, it also has complexity to it for beeing more than just a list, but also helping you to decide where to go, and analise not only what you want to buy, but also wich one has most of what you want and wich one is cheaper. 
-- [x] A project that appears to be a social network is a priori deemed by the staff to be indistinct from Project 4, and should not be submitted; it will be rejected. 
-A: The project has no intention on creating a social inviroment, it's purpose is to act as a tool.
-- [x] A project that appears to be an e-commerce site is strongly suspected to be indistinct from Project 2, and your README.md file should be very clear as to why it’s not. Failing that, it should not be submitted; it will be rejected. 
-A: It is not a place for buying, it's a place that serves the purpose of not only helping you remenber the things you want to buy, but also directing you to it.
-- [x] Your web application must utilize Django (including at least one model) on the back-end and JavaScript on the front-end. A: Created 4 models and js on the front to edit and save the supermarket adress, to add products in the list and ina supermarket.
-- [x] Your web application must be mobile-responsive. 
-A: The layout that i used in the pages of my application where designed in a way that made them easily mobile responsive.
+This project was conceived from an actual problem I often face in my day-to-day life: the price of food has grown constantly over time, but my income hasn't. Therefore, choosing where to buy my groceries is always an important aspect of helping me save money. In addition to that, I am a forgetful person, so I tend to return home from the store realizing I missed something.
+
+Understanding both of these problems, I developed a solution to solve them together: a shopping list application. This tool enables users to maintain multiple lists—such as one for a barbecue, another for a party, or separate lists for the weekend and the month. Once a list is created, the user can see which local markets provide those products and, more importantly, which specific market offers the lowest total price for that list
+
+
+## Distinctiveness and Complexity: Why you believe your project satisfies the distinctiveness and complexity requirements.
+
+### Distinctiveness
+
+My project, Shopping List, is distinct from the previous projects in this course in both utility and architecture. The primary differentiator is that while previous projects focused on standard CRUD operations (Create, Read, Update, and Delete) to manage information, this application goes a step further. It processes and "treats" raw data to provide actionable insights that support real-world decision-making.
+
+By utilizing a custom algorithm and a matrix-based data structure, the application cross-references user lists against supermarkets inventories. This moves the project beyond a simple data entry tool and transforms it into a functional comparison engine, helping users save money and time by identifying the most efficient shopping destinations based on current market data.
+
+- Project 0 (Search): While Project 0 was a front-end exercise to replicate Google’s search functionality using external URLs, my application is a self-contained ecosystem with a custom backend, database logic, and a unique internal search algorithm.
+
+- Project 1 (Wiki): Unlike the Wiki project, which served as a basic encyclopedia for information retrieval, my project focuses on dynamic data processing. It doesn't just store information; it calculates and compares user-specific data against vendor-provided variables.
+
+- Project 2 (Commerce): The Commerce project utilized a single-seller auction model for e-commerce. My solution is distinctly different as it contains no transaction or "checkout" process. Instead, it serves as a decision-support tool, helping users analyze where to shop rather than facilitating a direct purchase.
+
+- Project 3 (Mail): The Mail project was a communication tool designed to send and receive messages. My application offers no direct dialogue between users, focusing instead on the logistical relationship between a consumer's needs and a vendor's inventory.
+
+- Project 4 (Network): The Network project focused on social interactions and a "single-user" ecosystem (where every user has the same permissions). My solution revolves around a dual-user logic and a complex intersection of user-generated lists and vendor-generated price sets, rather than social features like "following" or "liking" posts.
+
+### Complexity
+
+The complexity of this project is rooted in the relational logic and the asynchronous user interface.
+
+- Relational Data Mapping: The backend manages a complex relationship between Users, Products, and Supermarkets. Specifically, the PriceMkt model acts as a sophisticated intermediary that allows different supermarkets to set unique prices for the same global Product object.
+
+- Dual-User Ecosystem: Although the application utilizes a single model for the User, it implements a functional duality between supermarkets and buyers. Depending on the account type, the user is presented with a vastly different experience, including unique views and specific backend functions tailored to their role.
+
+- Mobile Responsiveness: Recognizing the necessity of a mobile-responsive application, I implemented the Bootstrap Grid System and custom CSS media queries throughout the project. This ensures a seamless and functional user experience across both desktop browsers and mobile devices.
+
+- The Comparison Engine: The core complexity lies in the multi-layered data processing within views.py. When a user initiates a comparison, the application executes a series of relational queries to map a user's List objects to the PriceMkt junction table. It doesn't just display prices; it performs real-time arithmetic to calculate totals, identifies missing items, and returns a structured data object. This demonstrates Django's Object-Relational Mapping and complex Python data structures to handle many-to-many relationships.
+
+- Dynamic Frontend: To ensure a modern user experience, I heavily utilized the JavaScript Fetch API. Users can create lists, add products to those lists, and supermarkets can update their location data or product prices—all without a page reload. This required careful management of CSRF tokens within JavaScript and dynamic DOM manipulation to reflect database changes in real-time.
+
+- Role-Based Access Control: The application dynamically alters its interface and permissions based on the user's role. A "Supermarket" user sees a management dashboard, while a "Customer" sees a personal shopping hub. This required custom decorators and conditional rendering logic in Django templates to ensure data integrity and security.
+
 
 ## What’s contained in each file you created.
 
 ### ShoppingList (Project Folder)
-Main Django project configuration.
+Main Django project configuration. When creating through the terminal my Django application these files are auto generated.
 
 ### ShoppingList (Application)
 - `settings.py`  
-  Contains project settings, authentication configuration, installed apps, and user model configuration.
+  Contains project settings, authentication configuration, installed apps, and user model configuration. There i added the listapp on the apps avaiable, and the auth user so it could run.
 
 - `urls.py`  
-  Main URL configuration. Includes the routes from `listapp`.
+  Main URL configuration. I had to incluyde the routes from `listapp.url`.
 
 ---
 
@@ -70,9 +98,9 @@ Core application containing the business logic of the project.
   - **Listpage**  
     The listpage reffers to a page where you can see an especific list and you can only access your lists and if you're logged in. In the list you are able to add products directly, that's why the view has a post method, and the json response so you can add it without refreshing using js. it sends the list, the products on the lis and another list with all the products so you can add it.
   - **Userpage**  
-    The view for the user that is not a supermarket, it will open a page with all the lists the use rcreated, and enable the user to create more lists alson using java to not refresh thhe page when created.  
+    The view for the user that is not a supermarket, it will open a page with all the lists the user created, and enable the user to create more lists alson using javascript to not refresh thhe page when created.  
   - **Updateadress**  
-    This function was created so the java could update dthe adress on the supermarketpage.  
+    This function was created so the javascript could update the adress on the supermarketpage.  
   - **Supermarketpage**  
     This view is made for the user supermarket, it's made in a way that you can see the supermarket and it's products, and at the same time if you're the supermarket, you can add, edit an address and add products to you account.
   - **Productpage**  
@@ -90,10 +118,10 @@ Core application containing the business logic of the project.
   Where i created the admin information so i can see what happens when i create a superuser, able to create in the backend a user, product, price or list.
 
 - `urls.py`  
-  Defines the routes for the application, including the index page, routes for login, logout and register.
+  Defines the routes for the application, including the index page, routes for login, logout and register, the user page with it's lists, the list page, the supermarket page, the product page, the comparing prices page and the url to update the adress with js.
 
 - `tests.py`  
-  File responsible for automatic tests made to ensure changes don't affect the code main functions.
+  A simple test file responsible for automatic tests made to ensure changes don't affect the code main functions.
 
 #### templates
   Defines the templates for the project. I used bootstrap in everypage so i could have a more asthetic and padronized layout for my whole application, all the scripts were made in another file, script.js.
@@ -126,7 +154,7 @@ Core application containing the business logic of the project.
   This is your page, where you can see your lists, open to see the details on each one and also cerate new lists.
 
   - `prices.html`
-  Here it has a working mechanism that allows you to see wich supermarket has more products, and wich is cheaper or expensiver at the same time, it has an intuitive layout so you can analise and also let's you enter the supermarket page.
+  Here it has a working mechanism that allows you to see wich supermarket has more products, and wich is cheaper or more expensive at the same time, it has an intuitive layout so you can analise and also let's you enter the supermarket page.
 
 
 #### static
@@ -142,7 +170,6 @@ Core application containing the business logic of the project.
 1.  **Install dependencies**:  
     Ensure you have Python installed. Run:  
     `pip install -r requirements.txt`  
-    *(Note: If you haven't created one yet, ensure Pillow is installed for images: `pip install Pillow`)*
 
 2.  **Apply Migrations**:  
     `python manage.py makemigrations`  
@@ -160,8 +187,11 @@ Core application containing the business logic of the project.
 
 ## Any other additional information the staff should know about your project.
 
-- **Dual User Logic**: When registering, a user chooses if they are a "Customer" or a "Supermarket." The UI changes significantly based on this role.
-- **Comparison Engine**: The comparison on the `prices.html` page isn't just a list; it calculates the "missing items" vs "available items" ratio for your specific list at every registered market.
+- **Standardized Product Catalog**: To ensure data integrity, I intentionally restricted the ability of regular users or supermarkets to create new Product entries. This prevents the fragmentation of data—for example, avoiding separate entries for "Egg" vs. "Eggs." By maintaining a centralized catalog, the application ensures that the Comparison Engine can accurately match the same product across various supermarket inventories, providing a reliable price analysis.
+
+**Administrative Control**: The global product database is managed via the Django Admin interface. This allows for high-level quality control over product names, units of measurement, and imagery, ensuring a consistent experience for all users of the platform.
+
+**Future Roadmap**: For this MVP, the focus was on the creation and comparison of multiple shopping lists. Moving forward, I plan to implement additional management features, such as the ability to delete or archive old lists and the implementation of a user-requested product suggestion system to safely expand the catalog.
 
 
 ### Specifications
