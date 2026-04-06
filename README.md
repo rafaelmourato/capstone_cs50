@@ -59,7 +59,7 @@ Main Django project configuration. When creating through the terminal my Django 
   Contains project settings, authentication configuration, installed apps, and user model configuration. There i added the listapp on the apps avaiable, and the auth user so it could run.
 
 - `urls.py`  
-  Main URL configuration. I had to incluyde the routes from `listapp.url`.
+  Main URL configuration. I had to include the routes from `listapp.url`.
 
 ---
 
