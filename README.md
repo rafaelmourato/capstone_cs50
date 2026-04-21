@@ -14,40 +14,24 @@ This project was conceived from an actual problem I often face in my day-to-day 
 Understanding both of these problems, I developed a solution to solve them together: a shopping list application. This tool enables users to maintain multiple lists—such as one for a barbecue, another for a party, or separate lists for the weekend and the month. Once a list is created, the user can see which local markets provide those products and, more importantly, which specific market offers the lowest total price for that list
 
 
-## Distinctiveness and Complexity: Why you believe your project satisfies the distinctiveness and complexity requirements.
+## Distinctiveness and Complexity
 
-### Distinctiveness
 
-My project, Shopping List, is distinct from the previous projects in this course in both utility and architecture. The primary differentiator is that while previous projects focused on standard CRUD operations (Create, Read, Update, and Delete) to manage information, this application goes a step further. It processes and "treats" raw data to provide actionable insights that support real-world decision-making.
+The complexity of this project is rooted in the relational logic and the asynchronous user interface. The backend manages a complex relationship between Users, Products, and Supermarkets. Specifically, the PriceMkt model acts as a sophisticated intermediary that allows different supermarkets to set unique prices for the same global Product object.
 
-By utilizing a custom algorithm and a matrix-based data structure, the application cross-references user lists against supermarkets inventories. This moves the project beyond a simple data entry tool and transforms it into a functional comparison engine, helping users save money and time by identifying the most efficient shopping destinations based on current market data.
+Although the application utilizes a single model for the User, it implements a functional duality between supermarkets and buyers. Depending on the account type, the user is presented with a vastly different experience, including unique views and specific backend functions tailored to their role, this was made in a way that you can implement in a simpler code different experiences tha complement each other, one focused on the B2C and other the B2B.
 
-- Project 0 (Search): While Project 0 was a front-end exercise to replicate Google’s search functionality using external URLs, my application is a self-contained ecosystem with a custom backend, database logic, and a unique internal search algorithm.
+Another complexity was making it mobile responsive, it makes sense once it's an application with the function of beeing pratical and daily usable, since it's a tool for helping with daily buys, and was also a requirement for the project, so it suited well. That merge with a dinamic front-end utilizing the JavaScript Fetch API. Users can create lists, add products to those lists, and supermarkets can update their location data or product prices—all without a page reload. This required careful management of CSRF tokens within JavaScript and dynamic DOM manipulation to reflect database changes in real-time.
 
-- Project 1 (Wiki): Unlike the Wiki project, which served as a basic encyclopedia for information retrieval, my project focuses on dynamic data processing. It doesn't just store information; it calculates and compares user-specific data against vendor-provided variables.
+The core complexity lies in the multi-layered data processing within views.py. When a user initiates a comparison, the application executes a series of relational queries to map a user's List objects to the PriceMkt junction table. It doesn't just display prices, it performs real-time arithmetic to calculate totals, identifies missing items, and returns a structured data object. That was essential to make this a usefull tool not only a consulting page.
 
-- Project 2 (Commerce): The Commerce project utilized a single-seller auction model for e-commerce. My solution is distinctly different as it contains no transaction or "checkout" process. Instead, it serves as a decision-support tool, helping users analyze where to shop rather than facilitating a direct purchase.
+My project, Shopping List, is distinct both in utility and architecture. It processes and treats data to provide actionable insights that support real-world decision-making, by utilizing a custom algorithm and a matrix-based data structure, it dosen't work only by doing actions in the CRUD(create, read, update, delete), but by using mathematics to present useful information.
 
-- Project 3 (Mail): The Mail project was a communication tool designed to send and receive messages. My application offers no direct dialogue between users, focusing instead on the logistical relationship between a consumer's needs and a vendor's inventory.
+Something distinct about my application is that it utilizes the same model for different purposes, wich also provides two different experiencies for each user. The idea was to make a simpler code that could handle an experience to a user and another experience to a business in the same plataform, in a way that they can comunicate without having to connect different plataforms, but doing everything in a unique application.
 
-- Project 4 (Network): The Network project focused on social interactions and a "single-user" ecosystem (where every user has the same permissions). My solution revolves around a dual-user logic and a complex intersection of user-generated lists and vendor-generated price sets, rather than social features like "following" or "liking" posts.
+The idea is that supermarkets are provided a localized management dashboard to manipulate their specific inventory, while consumers receive a personalized shopping and comparison hub. By synthesizing a unified global product database with multi-vendor pricing matrices, Shopping List introduces a level of algorithmic processing and distinct data intersection that is entirely unique from the coursework.
 
-### Complexity
-
-The complexity of this project is rooted in the relational logic and the asynchronous user interface.
-
-- Relational Data Mapping: The backend manages a complex relationship between Users, Products, and Supermarkets. Specifically, the PriceMkt model acts as a sophisticated intermediary that allows different supermarkets to set unique prices for the same global Product object.
-
-- Dual-User Ecosystem: Although the application utilizes a single model for the User, it implements a functional duality between supermarkets and buyers. Depending on the account type, the user is presented with a vastly different experience, including unique views and specific backend functions tailored to their role.
-
-- Mobile Responsiveness: Recognizing the necessity of a mobile-responsive application, I implemented the Bootstrap Grid System and custom CSS media queries throughout the project. This ensures a seamless and functional user experience across both desktop browsers and mobile devices.
-
-- The Comparison Engine: The core complexity lies in the multi-layered data processing within views.py. When a user initiates a comparison, the application executes a series of relational queries to map a user's List objects to the PriceMkt junction table. It doesn't just display prices; it performs real-time arithmetic to calculate totals, identifies missing items, and returns a structured data object. This demonstrates Django's Object-Relational Mapping and complex Python data structures to handle many-to-many relationships.
-
-- Dynamic Frontend: To ensure a modern user experience, I heavily utilized the JavaScript Fetch API. Users can create lists, add products to those lists, and supermarkets can update their location data or product prices—all without a page reload. This required careful management of CSRF tokens within JavaScript and dynamic DOM manipulation to reflect database changes in real-time.
-
-- Role-Based Access Control: The application dynamically alters its interface and permissions based on the user's role. A "Supermarket" user sees a management dashboard, while a "Customer" sees a personal shopping hub. This required custom decorators and conditional rendering logic in Django templates to ensure data integrity and security.
-
+Most of what was done before were simple applications focused in using diferent aspects of django by themselves, this project not only utilizes most of was taught troughout the course, as introduces more, like mapping,  a new algorithm, a light adjustable front both in the browser and in a mobile enviroment, using javascript in a way that improves the experience and putting things like paginator to good use.
 
 ## What’s contained in each file you created.
 
@@ -85,7 +69,7 @@ Core application containing the business logic of the project.
     Contains:
       - Name
       - Picture (opitional)
-      - Unit of measure
+      - Unit of measure, needed to comparison
 
   - **PriceMkt**  
     Defines the relationship between a supermarket and a product.  
@@ -93,12 +77,13 @@ Core application containing the business logic of the project.
 
 - `views.py`  
   Contains the main application logic and request handling. It connects with the urls so our application has a logic beetween pages and functions.
+  The imports made were necessary to apply them inthe views created after and to help with handling the html.
   - **Index**  
     The main page, on it i defined the paginator and the logic to change pages to make the viewing of the products look better, in a way that in the same page you can see and explore: Products, Supermarkets avaiable and if you are logged in your lists.
   - **Listpage**  
     The listpage reffers to a page where you can see an especific list and you can only access your lists and if you're logged in. In the list you are able to add products directly, that's why the view has a post method, and the json response so you can add it without refreshing using js. it sends the list, the products on the lis and another list with all the products so you can add it.
   - **Userpage**  
-    The view for the user that is not a supermarket, it will open a page with all the lists the user created, and enable the user to create more lists alson using javascript to not refresh thhe page when created.  
+    The view for the user that is not a supermarket, it will open a page with all the lists the user created, and enable the user to create more lists alson using javascript to not refresh the page when created.  
   - **Updateadress**  
     This function was created so the javascript could update the adress on the supermarketpage.  
   - **Supermarketpage**  
@@ -106,7 +91,7 @@ Core application containing the business logic of the project.
   - **Productpage**  
     Brings to a page all the information off a product, and validate if it's a user, beeing a user it sends your lists so you can add the product to one of your lists.
   - **Prices**  
-    This is my favorite part of the code, it has a logic in a way that when you click go shopping and call this function, it will use python to calculate how many of the prdoucts on the list are in this supermarket and at the same time, how much you would spend on it, and displaying it on a page to the user.
+    This is my favorite part of the code, it has a logic in a way that when you click go shopping and call this function, it will use python to calculate how many of the products on the list are in this supermarket and at the same time, how much you would spend on it, and displaying it on a page to the user.
   - **login**  
     The standard login view.
   - **logout**  
